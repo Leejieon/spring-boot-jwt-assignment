@@ -1,6 +1,7 @@
 package com.sparta.intern.backend.infrastructure.repository;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -12,16 +13,21 @@ import com.sparta.intern.backend.domain.repository.UserRepository;
 @Repository
 public class InMemoryUserRepository implements UserRepository {
 
-	private final Map<Long, User> userStore = new ConcurrentHashMap<>();
+	private final Map<String, User> userStore = new ConcurrentHashMap<>();
 	private final AtomicLong idGenerator = new AtomicLong();
 
 	@Override
 	public User save(User user) {
 		Long userId = idGenerator.incrementAndGet();
 		user.setId(userId);
-		userStore.put(userId, user);
+		userStore.put(user.getUsername(), user);
 
 		return user;
+	}
+
+	@Override
+	public Optional<User> findByUsername(String username) {
+		return Optional.ofNullable(userStore.get(username));
 	}
 
 	@Override
